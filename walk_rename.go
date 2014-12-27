@@ -31,12 +31,12 @@ func NewName(oldName string) string {
     var count int = 0
     for _, char := range ooldName {
         if unicode.IsLower(char) && prev == '_' && count < 3 {
-            buffer.WriteString(string(unicode.ToUpper(char)))
+            buffer.WriteRune(unicode.ToUpper(char))
             count += 1
         } else if char == '-' {
-            buffer.WriteString("_")
+            buffer.WriteRune('_')
         } else {
-            buffer.WriteString(string(char))
+            buffer.WriteRune(char)
         }
         prev = char
     }
