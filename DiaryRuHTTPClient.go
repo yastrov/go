@@ -2,6 +2,8 @@
 Structs and functions for work with http://www.diary.ru
 Skills: JSON, http, Cookies, Auth
 Written by Yuri (Yuriy) Astrov
+P.S.
+JSON library is true, server is bad, because integers must be without quotes!
 */
 package main
 
@@ -23,7 +25,17 @@ import (
 
 type Unit struct {
 	Count int
-	Obj   json.RawMessage
+	Obj   *json.RawMessage
+}
+
+type UmailZeroInfo struct {
+	Sender string `json:"from_username"`
+	Title  string `json:"title"`
+}
+
+type UmailInfo struct {
+	Count int            `json:"count"`
+	First *UmailZeroInfo `json:"0"`
 }
 
 type UserInfo struct {
@@ -35,9 +47,9 @@ type UserInfo struct {
 type DiaryInfoRuJson struct {
 	Newcomments Unit
 	Discuss     Unit
-	Umails      Unit
+	Umails      UmailInfo `json:"umails"`
 	Userinfo    UserInfo
-	Error       string
+	Error       string `json:"error"`
 }
 
 func (o *DiaryInfoRuJson) Print() {
@@ -47,6 +59,9 @@ func (o *DiaryInfoRuJson) Print() {
 		fmt.Printf("Comments count: %d\n", o.Newcomments.Count)
 		fmt.Printf("Discuss count: %d\n", o.Discuss.Count)
 		fmt.Printf("Umails count: %d\n", o.Umails.Count)
+		if o.Umails.First != nil {
+			fmt.Println(&(o.Umails.First).Sender, ": ", o.Umails.First.Title)
+		}
 	} else {
 		fmt.Printf("Error: %s\n", o.Error)
 	}
