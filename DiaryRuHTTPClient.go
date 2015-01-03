@@ -24,8 +24,9 @@ import (
 )
 
 type Unit struct {
-	Count int
-	Obj   *json.RawMessage
+	Count int `json:"count,string"`
+	/*This must we doing because int represented as string*/
+	Obj *json.RawMessage
 }
 
 type UmailZeroInfo struct {
@@ -34,7 +35,7 @@ type UmailZeroInfo struct {
 }
 
 type UmailInfo struct {
-	Count int            `json:"count"`
+	Count int            `json:"count,string"`
 	First *UmailZeroInfo `json:"0"`
 }
 
