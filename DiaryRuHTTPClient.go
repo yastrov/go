@@ -118,15 +118,13 @@ func (o *DiaryRuClient) Auth(user, password string) {
 	s := o.Re.FindStringSubmatch(string(body))
 	data.Add("signature", s[1])
 	// Prepare Url
-	apiUrl := "http://pda.diary.ru"
-	resource := "/login.php"
-	u, _ := url.ParseRequestURI(apiUrl)
-	u.Path = resource
-	urlStr := fmt.Sprintf("%v", u)
+	u, _ := url.ParseRequestURI("http://pda.diary.ru")
+	u.Path = "/login.php"
 	// Send POST with auth data
-	r, _ := MyRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
+    reader := bytes.NewBufferString(data.Encode())
+	r, _ := MyRequest("POST", u.String(), reader)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+	r.Header.Add("Content-Length", strconv.Itoa(reader.Len()))
 	resp, _ = o.HttpClient.Do(r)
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
