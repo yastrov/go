@@ -121,6 +121,7 @@ func (o *DiaryRuClient) Auth(user, password string) {
 	u, _ := url.ParseRequestURI("http://pda.diary.ru")
 	u.Path = "/login.php"
 	// Send POST with auth data
+    //you can resp, err := http.PostForm(this.URL.String(), data), but cookies
     reader := bytes.NewBufferString(data.Encode())
 	r, _ := MyRequest("POST", u.String(), reader)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")

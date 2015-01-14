@@ -1,9 +1,10 @@
 /*
 Structs and functions for work with http://www.diary.ru API
-Skills: JSON, http, Auth, MD5 and hex.EncodeToString, url.URL, Unknown JSON
+Skills: JSON, http, Auth, MD5Sum and hex.EncodeToString, url.URL, Unknown JSON
 response decoding
 Written by Yuri (Yuriy) Astrov
 P.S.
+JSON library is true, server is bad, because integers must be without quotes!
 */
 package main
 
@@ -92,13 +93,14 @@ func (this *DiaryAPIClient) dorequest(values url.Values, data []byte) (r *http.R
 		values = url.Values{}
 		this.URL.RawQuery = values.Encode()
 	}
-	if data != nil {
+	if data == nil {
 		r, err = http.NewRequest("GET", this.URL.String(), nil)
 
 	} else {
 		reader := bytes.NewBuffer(data)
 		r, err = http.NewRequest("POST", this.URL.String(), reader)
 		r.Header.Add("Content-Length", strconv.Itoa(reader.Len()))
+		r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	}
 	r.Header.Add("User-agent", UserAgent)
 	return r, err
@@ -121,12 +123,12 @@ type PostStruct struct {
 	tags_data           map[string]string `json:"tags_data"`
 }
 
-func (this *DiaryAPIClient) post_get() {
+func (this *DiaryAPIClient) post_get(shortname string) {
 	values := url.Values{}
 	values.Add("sid", this.SID)
 	values.Add("type", "diary")
 	values.Add("method", "post.get")
-	values.Add("shortname", "yrain")
+	values.Add("shortname", shortname)
 
 	r, _ := this.dorequest(values, nil)
 	resp, _ := this.HttpClient.Do(r)
@@ -144,7 +146,8 @@ func (this *DiaryAPIClient) post_get() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var posts map[string]PostStruct //It's return empty PostStruct
+	//Also may try: var posts map[string]*PostStruct
+	var posts map[string]PostStruct //It's comfortable, but don't work
 	//var posts map[string]interface{} //It's work fine, but noncomfortable
 	err = json.Unmarshal(message["posts"], &posts)
 	fmt.Println(posts)
@@ -156,6 +159,42 @@ func (this *DiaryAPIClient) post_get() {
 	}
 }
 
+func (this *DiaryAPIClient) post_create(title, message string) {
+	values := url.Values{}
+	values.Add("sid", this.SID)
+	values.Add("message", message)
+	values.Add("message_src", message)
+	values.Add("method", "post.create")
+	values.Add("title", title)
+	values.Add("close_access_mode", "0")
+
+	this.URL.RawQuery = ""
+	resp, err := http.PostForm(this.URL.String(), values)
+	defer resp.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		log.Fatal(resp.StatusCode)
+	}
+	/*body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}*/
+	type APIResponse struct {
+		Result  int    `json:"result,string"`
+		Error   string `json:"error,string"`
+		Message string `json:"message"`
+		PostID  string `json:"postid"`
+	}
+	var message APIResponse
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&message)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	userPtr := flag.String("user", "", "Username (Login)")
 	passPtr := flag.String("pass", "", "Password")
@@ -164,5 +203,5 @@ func main() {
 	diary.Init()
 	diary.Auth(*userPtr, *passPtr)
 	fmt.Println(diary.SID)
-	diary.post_get()
+	diary.post_create("Test Title", "Test message")
 }
