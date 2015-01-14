@@ -34,6 +34,12 @@ Off site [http://golang.org/](http://golang.org/)
 -  OAuth2 [https://github.com/golang/oauth2](https://github.com/golang/oauth2)
 -  Go OAuth 2.0 [https://code.google.com/p/goauth2/](https://code.google.com/p/goauth2/)
 -  Context-aware middleware chains for Go web applications [https://github.com/.../stack](https://github.com/alexedwards/stack)
+-  [https://github.com/mattn/go-sqlite3](https://github.com/mattn/go-sqlite3)
+-  Golang LRU cache [https://github.com/hashicorp/golang-lru](https://github.com/hashicorp/golang-lru)
+-  groupcache is a caching and cache-filling library [https://github.com/golang/groupcache](https://github.com/golang/groupcache)
+-  Package kv implements a simple and easy to use persistent key/value (KV) store. [https://github.com/cznic/kv](https://github.com/cznic/kv)
+-  Simple, ordered, key-value persistence library for the Go Language [https://github.com/steveyen/gkvlite](https://github.com/steveyen/gkvlite)
+-  A fluent and functional approach to querying HTML [https://github.com/hailiang/html-query](https://github.com/hailiang/html-query)
 
 
 ## Github projects
