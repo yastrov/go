@@ -41,6 +41,10 @@ Off site [http://golang.org/](http://golang.org/)
 -  Simple, ordered, key-value persistence library for the Go Language [https://github.com/steveyen/gkvlite](https://github.com/steveyen/gkvlite)
 -  A fluent and functional approach to querying HTML [https://github.com/hailiang/html-query](https://github.com/hailiang/html-query)
 
+-  ORM-ish library for Go [https://github.com/coopernurse/gorp](https://github.com/coopernurse/gorp)
+-  The fantastic ORM library for Golang, aims to be developer friendly [https://github.com/jinzhu/gorm](https://github.com/jinzhu/gorm)
+-  general purpose extensions to golang's database/sql [https://github.com/jmoiron/sqlx](https://github.com/jmoiron/sqlx)
+
 
 ## Github projects
 -  Open Source Continuous File Synchronization [https://github.com/syncthing/syncthing](https://github.com/syncthing/syncthing)
