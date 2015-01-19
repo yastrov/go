@@ -170,9 +170,9 @@ func (this *DiaryAPIClient) post_get(shortname, type_, from string) ([]*PostStru
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*PostStruct, len(message.Posts))
-	for id, post_unit := range message.Posts {
-		fmt.Println(id, "-", post_unit.Postid)
+	result := make([]*PostStruct, 0, len(message.Posts))
+	for _, post_unit := range message.Posts {
+		//		fmt.Println(id, "-", post_unit.Postid)
 		result = append(result, post_unit)
 	}
 	return result, nil
@@ -226,7 +226,7 @@ type CommentStruct struct {
 	Author_userid    string `json:"author_userid"`
 	Author_shortname string `json:"author_shortname"`
 	Author_avatar    string `json:"author_avatar"`
-	Author_username  string `json:"author_shortname"`
+	Author_username  string `json:"author_username"`
 	Author_title     string `json:"author_title"`
 	Can_edit         string `json:"can_edit"`
 	Can_delete       string `json:"can_delete"`
@@ -250,7 +250,7 @@ func (this *DiaryAPIClient) comment_get(postid string) ([]*CommentStruct, error)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*CommentStruct, len(message.Comments))
+	result := make([]*CommentStruct, 0, len(message.Comments))
 	for _, comment_unit := range message.Comments {
 		comment_unit.Postid = postid
 		result = append(result, comment_unit)
@@ -258,7 +258,15 @@ func (this *DiaryAPIClient) comment_get(postid string) ([]*CommentStruct, error)
 	return result, nil
 }
 
-func (this *DiaryAPIClient) comment_get_for_post(post PostStruct) ([]*CommentStruct, error) {
+func (this *DiaryAPIClient) comment_get_for_post(post *PostStruct) ([]*CommentStruct, error) {
+	log.Println("post.Comments_count_data: ", post.Comments_count_data)
+	log.Println("post.post.Postid: ", post.Postid)
+	if post.Comments_count_data == "" {
+		return make([]*CommentStruct, 0), nil
+	}
+	if i, err := strconv.ParseUint(post.Comments_count_data, 10, 64); err != nil || i == 0 {
+		return make([]*CommentStruct, 0), nil
+	}
 	values := url.Values{}
 	values.Add("sid", this.SID)
 	values.Add("method", "comment.get")
@@ -275,24 +283,30 @@ func (this *DiaryAPIClient) comment_get_for_post(post PostStruct) ([]*CommentStr
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*CommentStruct, len(message.Comments))
+	result := make([]*CommentStruct, 0, len(message.Comments))
 	for _, comment_unit := range message.Comments {
 		comment_unit.Postid = post.Postid
+		log.Println(comment_unit.Author_username)
 		result = append(result, comment_unit)
 	}
 	return result, nil
 }
 
 func (this *DiaryAPIClient) comment_get_for_posts(posts []*PostStruct) (result []*CommentStruct, err error) {
-	//var result []*PostStruct
-	result = make([]*PostStruct, 20)
-	for post := range posts {
+	//var result []*CommentStruct
+	result = make([]*CommentStruct, 0, 20)
+	for _, post := range posts {
 		if post.Comments_count_data != "" {
-			comments, err := comment_get_for_post(*post)
-			result = append(result, comments)
+			comments, err := this.comment_get_for_post(post)
+			if err != nil {
+				return nil, err
+			}
+			for _, comment := range comments {
+				result = append(result, comment)
+			}
 		}
 	}
-	return result, err
+	return result, nil
 }
 
 func main() {
@@ -307,18 +321,24 @@ func main() {
 	}
 	fmt.Println(diary.SID)
 	//diary.post_create("Test Title", "Test message")
-	posts, err := diary.post_get("", "diary", "0")
+	posts, err := diary.post_get("", "diary", "")
+	fmt.Println(len(posts))
 	if err != nil {
 		log.Fatal(err)
 	}
-	for post := range posts {
-		fmt.Println((*post).Avatar_path)
-	}
-	comments, err := diary.comment_get()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for post := range comments {
-		fmt.Println(post.PostID)
+	fmt.Println(posts)
+	for _, post := range posts {
+		//fmt.Println(post.(*Avatar_path))
+		if post == nil {
+			//log.Fatal("post is nnil")
+			fmt.Println("nil", post)
+		}
+		comments, err := diary.comment_get_for_post(post)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, c := range comments {
+			fmt.Println(c.Postid)
+		}
 	}
 }
