@@ -1,4 +1,4 @@
 go
 ==
 
-Go (Google Golang) Cheat Sheet and simple axamples
+Go (Google Golang) Cheat Sheet and simple examples
